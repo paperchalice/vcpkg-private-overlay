@@ -1,0 +1,65 @@
+name: Build port
+on:
+  workflow_dispatch:
+    inputs:
+      port_name:
+        description: 'Port name you want to build' 
+        required: true
+
+run-name: Build port ${{ github.event.inputs.port_name }}
+
+env:
+  VCPKG_DEFAULT_TRIPLET: x64-windows-minsizerel
+  VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-minsizerel
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  VCPKG_OVERLAY_PORTS: "${{ github.workspace }}\\vcpkg-private-overlay\\ports"
+  VCPKG_OVERLAY_TRIPLETS: "${{ github.workspace }}\\vcpkg-private-overlay\\triplets"
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  Windows:
+    runs-on: windows-2022
+    steps:
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+      - name: Checkout vcpkg
+        uses: actions/checkout@v4
+        with:
+          repository: paperchalice/vcpkg
+          ref: overlay
+          fetch-depth: 1
+      - name: Checkout overlay
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          path: vcpkg-private-overlay
+
+      - name: Bootstrap
+        run: ./bootstrap-vcpkg.bat
+
+      - name: Build ${{ github.event.inputs.port_name }}
+        run: ./vcpkg install ${{ github.event.inputs.port_name }}
+      
+      - name: Print log
+        if: always()
+        run: |
+          if(Test-Path ./buildtrees/${{ github.event.inputs.port_name }}/*.log)`
+          { cat ./buildtrees/${{ github.event.inputs.port_name }}/*.log }
+
+      - name: Package ${{ github.event.inputs.port_name }}
+        run: |
+          tar -C packages/${{ github.event.inputs.port_name }}_x64-windows-minsizerel `
+            -cf - . | `
+            7z a -txz -mx9 -ms=on -si ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
+      
+      - name: Upload ${{ github.event.inputs.port_name }} package
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
