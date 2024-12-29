@@ -1,0 +1,13 @@
+{
+  "name": "ninja",
+  "version": "1.12.1",
+  "description": "A small build system with a focus on speed.",
+  "homepage": "https://ninja-build.org/",
+  "license": "Apache-2.0",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    }
+  ]
+}
