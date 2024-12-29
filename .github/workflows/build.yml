@@ -59,7 +59,15 @@ jobs:
             -cf - * | `
             7z a -txz -mx9 -ms=on -si ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
       
-      - name: Upload ${{ github.event.inputs.port_name }} package
-        uses: actions/upload-artifact@v4
+      # - name: Upload ${{ github.event.inputs.port_name }} package
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     path: ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
+      
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          path: ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
+          tag: init
+          overwrite: true
