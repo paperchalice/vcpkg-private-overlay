@@ -56,7 +56,7 @@ jobs:
       - name: Package ${{ github.event.inputs.port_name }}
         run: |
           tar -C packages/${{ github.event.inputs.port_name }}_x64-windows-minsizerel `
-            -cf - . | `
+            -cf - * | `
             7z a -txz -mx9 -ms=on -si ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
       
       - name: Upload ${{ github.event.inputs.port_name }} package
