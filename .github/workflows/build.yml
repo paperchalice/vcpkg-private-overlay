@@ -42,10 +42,10 @@ jobs:
           path: vcpkg-private-overlay
 
       - name: Bootstrap
-        run: ./bootstrap-vcpkg.bat
+        run: curl -L -o vcpkg.exe https://github.com/paperchalice/vcpkg-tool/releases/download/init/vcpkg.exe
 
       - name: Build ${{ github.event.inputs.port_name }}
-        run: ./vcpkg install ${{ github.event.inputs.port_name }}
+        run: ./vcpkg install ${{ github.event.inputs.port_name }} --with-build-dep
       
       - name: Print log
         if: always()
