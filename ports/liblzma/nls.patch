@@ -1,0 +1,83 @@
+diff --git a/src/xz/main.c b/src/xz/main.c
+--- a/src/xz/main.c
++++ b/src/xz/main.c
+@@ -11,9 +11,12 @@
+ 
+ #include "private.h"
+ #include <ctype.h>
+ 
++#include <stdlib.h>
++#include <string.h>
+ 
++
+ /// Exit status to use. This can be changed with set_exit_status().
+ static enum exit_status_type exit_status = E_SUCCESS;
+ 
+ #if defined(_WIN32) && !defined(__CYGWIN__)
+@@ -173,9 +176,24 @@
+ 	sandbox_init();
+ #endif
+ 
+ 	// Set up the locale and message translations.
+-	tuklib_gettext_init(PACKAGE, LOCALEDIR);
++	const char *locale_dir_ = LOCALEDIR;
++	char *alloc_str_ = NULL;
++	{
++		const char*vcpkg_root = getenv("VCPKG_ROOT");
++		if (vcpkg_root) {
++			const char pkg_dir[] = "/installed/x64-windows-release/share/locale";
++			size_t root_len = strlen(vcpkg_root);
++			alloc_str_ = (char *)malloc(root_len + sizeof(pkg_dir));
++			strcpy(alloc_str_, vcpkg_root);
++			strcat(alloc_str_, pkg_dir);
++			for (size_t i = 0; alloc_str_[i] != '\0'; ++i)
++				if (alloc_str_[i] == '\\') alloc_str_[i] = '/';
++			locale_dir_ = alloc_str_;
++		}
++	}
++	tuklib_gettext_init(PACKAGE, locale_dir_);
+ 
+ 	// Initialize progress message handling. It's not always needed
+ 	// but it's simpler to do this unconditionally.
+ 	message_init();
+diff --git a/src/lzmainfo/lzmainfo.c b/src/lzmainfo/lzmainfo.c
+--- a/src/lzmainfo/lzmainfo.c
++++ b/src/lzmainfo/lzmainfo.c
+@@ -12,8 +12,11 @@
+ #include "sysdefs.h"
+ #include <stdio.h>
+ #include <errno.h>
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ #include "lzma.h"
+ #include "getopt.h"
+ #include "tuklib_gettext.h"
+ #include "tuklib_progname.h"
+@@ -178,9 +181,24 @@
+ extern int
+ main(int argc, char **argv)
+ {
+ 	tuklib_progname_init(argv);
+-	tuklib_gettext_init(PACKAGE, LOCALEDIR);
++	const char *locale_dir_ = LOCALEDIR;
++	char *alloc_str_ = NULL;
++	{
++		const char*vcpkg_root = getenv("VCPKG_ROOT");
++		if (vcpkg_root) {
++			const char pkg_dir[] = "/installed/x64-windows-release/share/locale";
++			size_t root_len = strlen(vcpkg_root);
++			alloc_str_ = (char *)malloc(root_len + sizeof(pkg_dir));
++			strcpy(alloc_str_, vcpkg_root);
++			strcat(alloc_str_, pkg_dir);
++			for (size_t i = 0; alloc_str_[i] != '\0'; ++i)
++				if (alloc_str_[i] == '\\') alloc_str_[i] = '/';
++			locale_dir_ = alloc_str_;
++		}
++	}
++	tuklib_gettext_init(PACKAGE, locale_dir_);
+ 
+ 	parse_args(argc, argv);
+ 
+ #ifdef TUKLIB_DOSLIKE
