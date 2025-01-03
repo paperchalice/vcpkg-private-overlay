@@ -1,0 +1,7 @@
+{
+  "name": "mruby",
+  "version": "3.3.0",
+  "description": "Lightweight Ruby",
+  "homepage": "https://mruby.org/",
+  "license": "MIT"
+}
