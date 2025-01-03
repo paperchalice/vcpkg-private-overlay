@@ -1,0 +1,7 @@
+{
+  "name": "nasm",
+  "version": "2.16.3",
+  "description": "Netwide Assembler",
+  "homepage": "https://www.nasm.us/",
+  "license": "BSD-2-Clause"
+}
