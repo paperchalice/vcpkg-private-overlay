@@ -71,15 +71,26 @@ endif()
 cmake_path(NATIVE_PATH VCPKG_DETECTED_CMAKE_AR NORMALIZE ar)
 cmake_path(NATIVE_PATH VCPKG_DETECTED_CMAKE_LINKER NORMALIZE ld)
 
-vcpkg_build_nmake(
+set(inc_path ${VCPKG_ROOT_DIR}/installed/${TARGET_TRIPLET}/include)
+cmake_path(NATIVE_PATH inc_path NORMALIZE native_inc)
+
+vcpkg_install_nmake(
     SOURCE_PATH "${SOURCE_PATH}"
     PREFER_JOM
     CL_LANGUAGE NONE
     PRERUN_SHELL_RELEASE "${PERL}" Configure
-        ${CONFIGURE_OPTIONS} 
+        ${CONFIGURE_OPTIONS}
+        "enable-brotli-dynamic"
+        "--with-brotli-include=${native_inc}"
+        "zlib-dynamic"
+        "--with-zlib-include=${native_inc}"
+        "--with-zlib-lib=zlib1"
+        "enable-zstd-dynamic"
+        "--with-zstd-include=${native_inc}"
+        "--with-zstd-lib=zstd"
         ${OPENSSL_ARCH}
         "--prefix=${install_dir_native}"
-        "--openssldir=${install_dir_native}"
+        "--openssldir=${install_dir_native}\\ssl"
         "AS=${as}"
         "CC=${cc}"
         "CFLAGS=${VCPKG_COMBINED_C_FLAGS_RELEASE}"
@@ -101,7 +112,6 @@ vcpkg_build_nmake(
         "LD=${ld}"
         "LDFLAGS=${VCPKG_COMBINED_SHARED_LINKER_FLAGS_DEBUG}"
     PROJECT_NAME "makefile"
-    TARGET install_dev install_modules ${INSTALL_FIPS}
     LOGFILE_ROOT install
     OPTIONS
         "INSTALL_PDBS=OFF" # install-pdbs.patch

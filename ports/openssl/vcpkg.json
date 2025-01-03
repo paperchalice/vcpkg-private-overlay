@@ -16,13 +16,23 @@
     {
       "name": "vcpkg-cmake-get-vars",
       "host": true
+    },
+    {
+      "name": "brotli",
+      "host": true
+    },
+    {
+      "name": "zlib",
+      "host": true
+    },
+    {
+      "name": "zstd",
+      "host": true
     }
   ],
   "default-features": [
     "fips",
-    "ssl3",
-    "tools",
-    "weak-ssl-ciphers"
+    "tools"
   ],
   "features": {
     "fips": {
