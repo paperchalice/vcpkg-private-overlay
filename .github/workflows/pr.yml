@@ -1,0 +1,9 @@
+name: Trigger
+on:
+  pull_request:
+
+jobs:
+  call-build:
+    uses: paperchalice/vcpkg-private-overlay/.github/workflows/build.yml@main
+    with:
+      port_name: ${{ github.event.pull_request.title }}
