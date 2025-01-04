@@ -1,5 +1,10 @@
 name: Build port
 on:
+  workflow_call:
+    inputs:
+      port_name:
+        description: 'Port name you want to build' 
+        required: true
   workflow_dispatch:
     inputs:
       port_name:
