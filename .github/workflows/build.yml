@@ -1,12 +1,18 @@
 name: Build port
 on:
+  workflow_call:
+    inputs:
+      port_name:
+        description: 'Port name you want to build' 
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       port_name:
         description: 'Port name you want to build' 
         required: true
 
-run-name: Build port ${{ github.event.inputs.port_name }}
+run-name: Build port ${{ inputs.port_name }}
 
 env:
   VCPKG_DEFAULT_TRIPLET: x64-windows-minsizerel
@@ -44,30 +50,30 @@ jobs:
       - name: Bootstrap
         run: curl -L -o vcpkg.exe https://github.com/paperchalice/vcpkg-tool/releases/download/init/vcpkg.exe
 
-      - name: Build ${{ github.event.inputs.port_name }}
-        run: ./vcpkg install ${{ github.event.inputs.port_name }} --with-build-dep
+      - name: Build ${{ inputs.port_name }}
+        run: ./vcpkg install ${{ inputs.port_name }} --with-build-dep
       
       - name: Print log
         if: always()
         run: |
-          if(Test-Path ./buildtrees/${{ github.event.inputs.port_name }}/*.log)`
-          { cat ./buildtrees/${{ github.event.inputs.port_name }}/*.log }
+          if(Test-Path ./buildtrees/${{ inputs.port_name }}/*.log)`
+          { cat ./buildtrees/${{ inputs.port_name }}/*.log }
 
-      - name: Package ${{ github.event.inputs.port_name }}
+      - name: Package ${{ inputs.port_name }}
         run: |
-          tar -C packages/${{ github.event.inputs.port_name }}_x64-windows-minsizerel `
+          tar -C packages/${{ inputs.port_name }}_x64-windows-minsizerel `
             -cf - * | `
-            7z a -txz -mx9 -ms=on -si ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
+            7z a -txz -mx9 -ms=on -si ${{ inputs.port_name }}_x64-windows-minsizerel.tar.xz
       
-      # - name: Upload ${{ github.event.inputs.port_name }} package
+      # - name: Upload ${{ inputs.port_name }} package
       #   uses: actions/upload-artifact@v4
       #   with:
-      #     path: ${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
+      #     path: ${{ inputs.port_name }}_x64-windows-minsizerel.tar.xz
       
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./${{ github.event.inputs.port_name }}_x64-windows-minsizerel.tar.xz
+          file: ./${{ inputs.port_name }}_x64-windows-minsizerel.tar.xz
           tag: init
           overwrite: true
