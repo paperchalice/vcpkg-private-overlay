@@ -1,0 +1,6 @@
+{
+  "name": "libmpdec",
+  "version": "4.0.0",
+  "description": "Package for correctly-rounded arbitrary precision decimal floating point arithmetic",
+  "homepage": "https://www.bytereef.org/mpdecimal/index.html"
+}
