@@ -27,7 +27,7 @@ if(NOT _VCPKG_WINDOWS_TOOLCHAIN)
     set(MP_BUILD_FLAG "/MP ")
   endif()
 
-  set(common_flags "/nologo /permissive- /DWIN32 /D_WINDOWS /utf-8 ${MP_BUILD_FLAG}")
+  set(common_flags "/nologo /permissive- /D_CRT_DECLARE_NONSTDC_NAMES /DWIN32 /D_WINDOWS /utf-8 ${MP_BUILD_FLAG}")
   set(CMAKE_CXX_FLAGS " ${common_flags} /std:c++latest /GR /EHsc /Zc:__cplusplus /Zc:wchar_t ${VCPKG_CXX_FLAGS}" CACHE STRING "")
   set(CMAKE_C_FLAGS " ${common_flags} /std:clatest /Zc:__STDC__ ${VCPKG_C_FLAGS}" CACHE STRING "")
 
