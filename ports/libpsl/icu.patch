@@ -1,0 +1,96 @@
+---
+ fuzz/libpsl_fuzzer.c |  6 +++++-
+ meson.build          | 10 +++++++++-
+ src/psl.c            | 16 ++++++++++++----
+ 3 files changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/fuzz/libpsl_fuzzer.c b/fuzz/libpsl_fuzzer.c
+index 963193e..22514c5 100644
+--- a/fuzz/libpsl_fuzzer.c
++++ b/fuzz/libpsl_fuzzer.c
+@@ -35,8 +35,12 @@ typedef unsigned __int8 uint8_t;
+ #include <stdlib.h> /* malloc, free */
+ #include <string.h> /* memcpy */
+ 
+-#if defined(WITH_LIBICU)
++#ifdef WITH_LIBICU
++#ifndef WITH_LIBICU_WIN
+ #include <unicode/uclean.h>
++#else
++#include <icu.h>
++#endif
+ #endif
+ 
+ #include "libpsl.h"
+diff --git a/meson.build b/meson.build
+index bea815a..e25e953 100644
+--- a/meson.build
++++ b/meson.build
+@@ -14,6 +14,7 @@ buildtype = get_option('buildtype')
+ notfound = dependency('', required : false)
+ libidn2_dep = notfound
+ libicu_dep = notfound
++libicu_win_dep = notfound
+ libidn_dep = notfound
+ libunistring = notfound
+ networking_deps = notfound
+@@ -40,10 +41,16 @@ if ['libidn2', 'auto'].contains(enable_runtime)
+ endif
+ 
+ if ['libicu', 'auto'].contains(enable_runtime)
++  libicu_win_dep = cc.find_library('icu', required: false)
+   libicu_dep = dependency('icu-uc', 'ICU',
+                           components: 'uc',
+                           required : false)
+-  if libicu_dep.found()
++  if libicu_win_dep.found()
++    libicu_dep = libicu_win_dep
++    if enable_runtime == 'auto'
++      enable_runtime = 'libicu'
++    endif
++  elif libicu_dep.found()
+     if enable_runtime == 'auto'
+       enable_runtime = 'libicu'
+     endif
+@@ -89,6 +96,7 @@ config = configuration_data()
+ config.set_quoted('PACKAGE_VERSION', meson.project_version())
+ config.set('WITH_LIBIDN2', enable_runtime == 'libidn2')
+ config.set('WITH_LIBICU', enable_runtime == 'libicu')
++config.set('WITH_LIBICU_WIN', libicu_win_dep.found())
+ config.set('WITH_LIBIDN', enable_runtime == 'libidn')
+ config.set('ENABLE_BUILTIN', enable_builtin)
+ config.set('HAVE_UNISTD_H', cc.check_header('unistd.h'))
+diff --git a/src/psl.c b/src/psl.c
+index 28caff9..ee3e5d3 100644
+--- a/src/psl.c
++++ b/src/psl.c
+@@ -70,10 +70,14 @@ typedef SSIZE_T ssize_t;
+ #endif
+ 
+ #ifdef WITH_LIBICU
+-#	include <unicode/uversion.h>
+-#	include <unicode/ustring.h>
+-#	include <unicode/uidna.h>
+-#	include <unicode/ucnv.h>
++#	ifndef WITH_LIBICU_WIN
++#		include <unicode/uversion.h>
++#		include <unicode/ustring.h>
++#		include <unicode/uidna.h>
++#		include <unicode/ucnv.h>
++#	else
++#		include <icu.h>
++#	endif
+ #elif defined(WITH_LIBIDN2)
+ #	include <iconv.h>
+ #	include <idn2.h>
+@@ -116,6 +120,10 @@ typedef SSIZE_T ssize_t;
+ #define PRIV_PSL_FLAG_PRIVATE   (1<<3) /* entry of PRIVATE section */
+ #define PRIV_PSL_FLAG_PLAIN     (1<<4) /* just used for PSL syntax checking */
+ 
++#ifdef WITH_LIBICU_WIN
++#	define U_ICU_VERSION "Windows"
++#endif
++
+ typedef struct {
+ 	char
+ 		label_buf[128];
