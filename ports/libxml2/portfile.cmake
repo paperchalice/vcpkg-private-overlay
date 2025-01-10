@@ -93,7 +93,7 @@ endif()
 file(COPY "${CURRENT_PACKAGES_DIR}/include/libxml2/" DESTINATION "${CURRENT_PACKAGES_DIR}/include") # TODO: Fix usage in all dependent ports hardcoding the wrong include path.
 
 configure_file(
-    ${CMAKE_CURRENT_LIST_DIR}/libxml2.psm1 ${CURRENT_PACKAGES_DIR}/share/PowerShell/Modules/libxml2.psm1
+    ${CMAKE_CURRENT_LIST_DIR}/libxml2.psm1 ${CURRENT_PACKAGES_DIR}/share/PowerShell/Modules/libxml2/libxml2.psm1
     @ONLY
 )
 
