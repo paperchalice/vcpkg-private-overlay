@@ -10,18 +10,19 @@ vcpkg_extract_source_archive(
 )
 
 set(libdec_path ${SOURCE_PATH}/libmpdec)
+vcpkg_replace_string(${libdec_path}/Makefile.vc libmpdec mpdec)
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} -E rename Makefile.vc Makefile
-  COMMAND nmake /f Makefile MACHINE=x64 DEBUG=0
+  COMMAND nmake /f Makefile MACHINE=x64 DLL=1 DEBUG=0
   WORKING_DIRECTORY ${libdec_path}
 )
 
 file(INSTALL ${libdec_path}/mpdecimal.h DESTINATION ${CURRENT_PACKAGES_DIR}/include)
-file(INSTALL ${libdec_path}/libmpdec-${VERSION}.dll.lib DESTINATION ${CURRENT_PACKAGES_DIR}/lib)
-file(INSTALL ${libdec_path}/libmpdec-${VERSION}.dll DESTINATION ${CURRENT_PACKAGES_DIR}/bin)
-file(INSTALL ${libdec_path}/libmpdec-${VERSION}.dll.lib DESTINATION ${CURRENT_PACKAGES_DIR}/lib)
-file(RENAME ${CURRENT_PACKAGES_DIR}/lib/libmpdec-${VERSION}.dll.lib ${CURRENT_PACKAGES_DIR}/lib/mpdec.lib)
+file(INSTALL ${libdec_path}/mpdec-${VERSION}.dll.lib DESTINATION ${CURRENT_PACKAGES_DIR}/lib)
+file(INSTALL ${libdec_path}/mpdec-${VERSION}.dll DESTINATION ${CURRENT_PACKAGES_DIR}/bin)
+file(INSTALL ${libdec_path}/mpdec-${VERSION}.dll.lib DESTINATION ${CURRENT_PACKAGES_DIR}/lib)
+file(RENAME ${CURRENT_PACKAGES_DIR}/lib/mpdec-${VERSION}.dll.lib ${CURRENT_PACKAGES_DIR}/lib/mpdec.lib)
 configure_file(${libdec_path}/.pc/libmpdec.pc.in
   ${CURRENT_PACKAGES_DIR}/lib/pkgconfig/libmpdec.pc
   @ONLY
@@ -30,4 +31,4 @@ vcpkg_fixup_pkgconfig()
 vcpkg_replace_string(${CURRENT_PACKAGES_DIR}/lib/pkgconfig/libmpdec.pc
   "-lmpdec -lm" "-lmpdec"
 )
-vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE.txt ")
+vcpkg_install_copyright(FILE_LIST ${SOURCE_PATH}/COPYRIGHT.txt)
