@@ -17,8 +17,7 @@ vcpkg_from_github(
     SHA512 dfe0529dd2fbb7dc9e79505b9c6ff7f29979fa4392d534c1b8859fa9934c2e7d4da3429265d718292056809a58080af32b130263625cdeb358123774c27da7c6
     HEAD_REF master
     PATCHES
-        fix_cmakelist.patch
-        fix_ios_compilation.patch
+        output.patch
         ${FIX_COMPATIBILITY_PATCH}
         ${ADD_MISSING_BCRYPT_PATCH}
 )

@@ -51,10 +51,10 @@ Known values for OPTION are:
   }
   if ($Libs) {
     if ($Dynamic) {
-      $output += "/LIBPATH:$prefix\lib", "libxml.lib"
+      $output += "/LIBPATH:$prefix\lib", "xml.lib"
     }
     else {
-      $output += "/LIBPATH:$prefix\lib", "libxml.lib", "lzma.lib", "zlib.lib", "iconv.lib", "WS2_32.lib", "bcrypt.lib"
+      $output += "/LIBPATH:$prefix\lib", "xml.lib", "lzma.lib", "zlib.lib", "iconv.lib", "WS2_32.lib", "bcrypt.lib"
     }
   }
 

@@ -1,0 +1,16 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -429,12 +429,10 @@
+ 
+ set_target_properties(
+     LibXml2
+     PROPERTIES
+-    IMPORT_PREFIX lib
+     OUTPUT_NAME xml2
+     POSITION_INDEPENDENT_CODE ON
+-    PREFIX lib
+     VERSION ${PROJECT_VERSION}
+     SOVERSION ${LIBXML_MAJOR_VERSION}
+ )
+ 
