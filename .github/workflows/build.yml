@@ -20,6 +20,7 @@ env:
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
   VCPKG_OVERLAY_PORTS: "${{ github.workspace }}\\vcpkg-private-overlay\\ports"
   VCPKG_OVERLAY_TRIPLETS: "${{ github.workspace }}\\vcpkg-private-overlay\\triplets"
+  PKG_CONFIG: "${{ github.workspace }}\\installed\\x64-windows-minsizerel\\bin\\pkgconf.exe"
 
 defaults:
   run:
