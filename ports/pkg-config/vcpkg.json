@@ -1,0 +1,11 @@
+{
+  "name": "pkg-config",
+  "version": "0.0.1",
+  "description": "pkg-config alias",
+  "homepage": "https://github.com/pkgconf/pkgconf",
+  "license": null,
+  "supports": "!uwp",
+  "dependencies": [
+    "pkgconf"
+  ]
+}
