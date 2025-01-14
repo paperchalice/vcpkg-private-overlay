@@ -50,7 +50,9 @@ jobs:
           path: vcpkg-private-overlay
 
       - name: Bootstrap
-        run: curl -L -o vcpkg.exe https://github.com/paperchalice/vcpkg-tool/releases/download/init/vcpkg.exe
+        run: |
+          curl -L -o vcpkg.exe https://github.com/paperchalice/vcpkg-tool/releases/download/init/vcpkg.exe
+          ./vcpkg install pkg-config
 
       - name: Build ${{ inputs.port_name }}
         run: ./vcpkg install ${{ inputs.port_name }} --with-build-dep
