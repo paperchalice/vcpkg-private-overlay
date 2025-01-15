@@ -65,6 +65,9 @@ endif()
 
 vcpkg_find_acquire_program(PKGCONFIG)
 
+# Remove it when FindLibrtmp.cmake is available.
+vcpkg_replace_string(${SOURCE_PATH}/CMakeLists.txt "(HAVE_LIBRTMP)" "(ON)")
+
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS 
