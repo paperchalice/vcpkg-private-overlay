@@ -1,0 +1,32 @@
+name: Build tool
+on:
+  workflow_dispatch
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  Windows:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout vcpkg-tool
+        uses: actions/checkout@v4
+        with:
+          repository: paperchalice/vcpkg-tool
+          ref: downstream
+          fetch-depth: 1
+      - name: Setup shell
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./build/vcpkg.exe
+          tag: init
+          overwrite: true
