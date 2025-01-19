@@ -5,6 +5,8 @@
   "homepage": "https://curl.se/",
   "license": "curl AND ISC AND BSD-3-Clause",
   "dependencies": [
+    "ngtcp2",
+    "nghttp3",
     {
       "name": "pkg-config",
       "host": true
@@ -29,6 +31,7 @@
     "rtmp",
     "ssh",
     "ssl",
+    "sspi",
     "tool",
     "zstd"
   ],
@@ -207,7 +210,7 @@
           "name": "curl",
           "default-features": false,
           "features": [
-            "schannel"
+            "openssl"
           ],
           "platform": "(windows & !uwp) | mingw"
         },
