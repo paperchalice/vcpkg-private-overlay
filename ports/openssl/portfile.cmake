@@ -1,77 +1,53 @@
-if(EXISTS "${CURRENT_INSTALLED_DIR}/share/libressl/copyright"
-    OR EXISTS "${CURRENT_INSTALLED_DIR}/share/boringssl/copyright")
-    message(FATAL_ERROR "Can't build openssl if libressl/boringssl is installed. Please remove libressl/boringssl, and try install openssl again if you need it.")
+if(EXISTS "${CURRENT_INSTALLED_DIR}/include/openssl/ssl.h")
+    message(FATAL_ERROR "Can't build libressl if openssl is installed. Please remove openssl, and try install libressl again if you need it.")
 endif()
 
-if(VCPKG_TARGET_IS_EMSCRIPTEN)
-    vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
-endif()
+vcpkg_download_distfile(
+    LIBRESSL_SOURCE_ARCHIVE
+    URLS "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${VERSION}.tar.gz"
+         "https://github.com/libressl/portable/releases/download/v${VERSION}/libressl-${VERSION}.tar.gz"
+    FILENAME "libressl-${VERSION}.tar.gz"
+    SHA512 b5ec6d1f4e3842ecb487f9a67d86db658d05cbe8cd3fcba61172affa8c65c5d0823aa244065a7233f06c669d04a5a36517c02a2d99d2f2da3c4df729ac243b37
+)
 
-vcpkg_from_github(
-    OUT_SOURCE_PATH SOURCE_PATH
-    REPO openssl/openssl
-    REF "openssl-${VERSION}"
-    SHA512 d5f78b2e9d7b7b4787c976c4f832b1448bbadf5f9d398a50ef98053f92501768d000aa73673af200568aef4c8a491442ebbee8c43556838f465d4f91dfc2b5ad
+vcpkg_extract_source_archive(
+    SOURCE_PATH
+    ARCHIVE "${LIBRESSL_SOURCE_ARCHIVE}"
     PATCHES
-        cmake-config.patch
-        command-line-length.patch
-        script-prefix.patch
-        asm-armcap.patch
-        windows/install-layout.patch
-        windows/install-pdbs.patch
+        pkgconfig.diff
 )
 
-vcpkg_list(SET CONFIGURE_OPTIONS
-    enable-static-engine
-    enable-capieng
-    no-tests
-    no-docs
+vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
+    FEATURES
+        "tools" LIBRESSL_APPS
 )
 
-set(INSTALL_FIPS "")
-if("fips" IN_LIST FEATURES)
-    vcpkg_list(APPEND INSTALL_FIPS install_fips)
-    vcpkg_list(APPEND CONFIGURE_OPTIONS enable-fips)
+vcpkg_cmake_configure(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS
+        ${FEATURE_OPTIONS}
+        -DLIBRESSL_INSTALL_CMAKEDIR=share/libressl
+        -DLIBRESSL_TESTS=OFF
+    OPTIONS_DEBUG
+        -DLIBRESSL_APPS=OFF
+)
+
+vcpkg_cmake_install()
+vcpkg_copy_pdbs()
+vcpkg_fixup_pkgconfig()
+vcpkg_cmake_config_fixup()
+
+# libressl as openssl replacement
+configure_file("${CURRENT_PORT_DIR}/vcpkg-cmake-wrapper.cmake.in" "${CURRENT_PACKAGES_DIR}/share/openssl/vcpkg-cmake-wrapper.cmake" @ONLY)
+
+if("tools" IN_LIST FEATURES)
+    vcpkg_copy_tools(TOOL_NAMES ocspcheck openssl DESTINATION "${CURRENT_PACKAGES_DIR}/tools/openssl" AUTO_CLEAN)
 endif()
 
-if(VCPKG_LIBRARY_LINKAGE STREQUAL "dynamic")
-    vcpkg_list(APPEND CONFIGURE_OPTIONS shared)
-else()
-    vcpkg_list(APPEND CONFIGURE_OPTIONS no-shared no-module)
-endif()
+file(REMOVE_RECURSE
+    "${CURRENT_PACKAGES_DIR}/debug/etc/ssl/certs"
+    "${CURRENT_PACKAGES_DIR}/debug/include"
+    "${CURRENT_PACKAGES_DIR}/debug/share"
+)
 
-if(NOT "tools" IN_LIST FEATURES)
-    vcpkg_list(APPEND CONFIGURE_OPTIONS no-apps)
-endif()
-
-if("weak-ssl-ciphers" IN_LIST FEATURES)
-    vcpkg_list(APPEND CONFIGURE_OPTIONS enable-weak-ssl-ciphers)
-endif()
-
-if("ssl3" IN_LIST FEATURES)
-    vcpkg_list(APPEND CONFIGURE_OPTIONS enable-ssl3)
-    vcpkg_list(APPEND CONFIGURE_OPTIONS enable-ssl3-method)
-endif()
-
-if(DEFINED OPENSSL_USE_NOPINSHARED)
-    vcpkg_list(APPEND CONFIGURE_OPTIONS no-pinshared)
-endif()
-
-if(OPENSSL_NO_AUTOLOAD_CONFIG)
-    vcpkg_list(APPEND CONFIGURE_OPTIONS no-autoload-config)
-endif()
-
-include("${CMAKE_CURRENT_LIST_DIR}/windows/portfile.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/install-pc-files.cmake")
-
-file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-
-if (NOT "${VERSION}" MATCHES [[^([0-9]+)\.([0-9]+)\.([0-9]+)$]])
-    message(FATAL_ERROR "Version regex did not match.")
-endif()
-set(OPENSSL_VERSION_MAJOR "${CMAKE_MATCH_1}")
-set(OPENSSL_VERSION_MINOR "${CMAKE_MATCH_2}")
-set(OPENSSL_VERSION_FIX "${CMAKE_MATCH_3}")
-configure_file("${CMAKE_CURRENT_LIST_DIR}/vcpkg-cmake-wrapper.cmake.in" "${CURRENT_PACKAGES_DIR}/share/${PORT}/vcpkg-cmake-wrapper.cmake" @ONLY)
-
-vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE.txt")
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")
