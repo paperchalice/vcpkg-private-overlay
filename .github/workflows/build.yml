@@ -3,14 +3,17 @@ on:
   workflow_call:
     inputs:
       port_name:
-        description: 'Port name you want to build' 
+        description: 'Port name you want to build'
         required: true
         type: string
   workflow_dispatch:
     inputs:
       port_name:
-        description: 'Port name you want to build' 
+        description: 'Port name you want to build'
         required: true
+      features:
+        description: 'Port features'
+        type: string
 
 run-name: Build port ${{ inputs.port_name }}
 
@@ -56,8 +59,11 @@ jobs:
           ./vcpkg install pkg-config
 
       - name: Build ${{ inputs.port_name }}
-        run: ./vcpkg install ${{ inputs.port_name }} --with-build-dep
-      
+        run: |
+          $features = '${{ inputs.features }}'
+          $port_name = '${{ inputs.port_name }}' + (($features) ? "[$features]" : '')
+          ./vcpkg install $port_name --with-build-dep
+
       - name: Print log
         if: always()
         run: |
@@ -69,12 +75,12 @@ jobs:
           tar -C packages/${{ inputs.port_name }}_x64-windows-minsizerel `
             -cf - * | `
             7z a -txz -mx9 -ms=on -si ${{ inputs.port_name }}_x64-windows-minsizerel.tar.xz
-      
+
       # - name: Upload ${{ inputs.port_name }} package
       #   uses: actions/upload-artifact@v4
       #   with:
       #     path: ${{ inputs.port_name }}_x64-windows-minsizerel.tar.xz
-      
+
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
