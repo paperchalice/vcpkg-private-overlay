@@ -7,7 +7,8 @@ vcpkg_from_github(
     SHA512 ed9adae1115ea1a33e6f3a259c98389ae7520f59a15e9bae3b68b0d19d441e271352e86fa82d6644576ca6c5a83322bd01028fdc1789b762c5a1cceb08eff37d
     HEAD_REF master
     PATCHES
-        
+        remove_imp_suffix.patch
+        pkgconfig.patch
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
@@ -63,7 +64,6 @@ vcpkg_find_acquire_program(PKGCONFIG)
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS 
-        "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_LIST_DIR}/cmake-project-include.cmake"
         "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
         ${FEATURE_OPTIONS}
         ${OPTIONS}
@@ -84,21 +84,10 @@ vcpkg_copy_pdbs()
 if ("tool" IN_LIST FEATURES)
     vcpkg_copy_tools(TOOL_NAMES curl AUTO_CLEAN)
 endif()
-if ("rtmp" IN_LIST FEATURES)
-    file(INSTALL ${SOURCE_PATH}/CMake/FindLibrtmp.cmake DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT})
-endif()
 
 vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/CURL)
 
 vcpkg_fixup_pkgconfig()
-set(namespec "curl")
-if(VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)
-    set(namespec "libcurl")
-    vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/lib/pkgconfig/libcurl.pc" " -lcurl" " -l${namespec}")
-endif()
-if(NOT DEFINED VCPKG_BUILD_TYPE)
-    vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/debug/lib/pkgconfig/libcurl.pc" " -lcurl" " -l${namespec}-d")
-endif()
 
 #Fix install path
 vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/bin/curl-config" "${CURRENT_PACKAGES_DIR}" "\${prefix}")
