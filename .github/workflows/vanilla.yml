@@ -1,0 +1,53 @@
+name: Build vanilla port
+on:
+  workflow_dispatch:
+    inputs:
+      port_name:
+        description: 'Port name you want to build'
+        required: true
+      features:
+        description: 'Port features'
+        type: string
+
+run-name: Build port ${{ inputs.port_name }}
+
+env:
+  VCPKG_DEFAULT_TRIPLET: x64-windows-release
+  VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-releases
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  Windows:
+    runs-on: windows-2022
+    steps:
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+      - name: Checkout vcpkg
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: master
+          fetch-depth: 1
+
+      - name: Bootstrap
+        run: |
+          ./bootstrap-vcpkg.bat
+
+      - name: Build ${{ inputs.port_name }}
+        run: |
+          $features = '${{ inputs.features }}'
+          $port_name = '${{ inputs.port_name }}' + (($features) ? "[$features]" : '')
+          ./vcpkg install $port_name --debug
+
+      - name: Print log
+        if: always()
+        run: |
+          if(Test-Path ./buildtrees/${{ inputs.port_name }}/*.log)`
+          { cat ./buildtrees/${{ inputs.port_name }}/*.log }
