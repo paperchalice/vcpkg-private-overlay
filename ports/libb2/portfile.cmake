@@ -7,9 +7,8 @@ vcpkg_from_github(
     PATCHES msvc-cpuid.patch
 )
 
-if(CMAKE_HOST_WIN32)
-    set(OPTIONS --disable-native) # requires cpuid
-endif()
+
+vcpkg_make_get_shell(shell_var)
 
 vcpkg_make_configure(
     AUTORECONF
@@ -19,10 +18,7 @@ vcpkg_make_configure(
 )
 vcpkg_make_install()
 vcpkg_fixup_pkgconfig()
-
+vcpkg_copy_pdbs()
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
-
-vcpkg_copy_pdbs()
-
-file(INSTALL ${SOURCE_PATH}/COPYING DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)

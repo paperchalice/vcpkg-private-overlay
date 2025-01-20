@@ -20,12 +20,10 @@ run-name: Build port ${{ inputs.port_name }}
 env:
   VCPKG_DEFAULT_TRIPLET: x64-windows-minsizerel
   VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-minsizerel
-  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite;default,readwrite"
   VCPKG_OVERLAY_PORTS: "${{ github.workspace }}\\vcpkg-private-overlay\\ports"
   VCPKG_OVERLAY_TRIPLETS: "${{ github.workspace }}\\vcpkg-private-overlay\\triplets"
-  VCPKG_KEEP_ENV_VARS: "PATH;Path"
   MY_DOWNLOAD_ROOT: "https://github.com/paperchalice/vcpkg-private-overlay/releases/download/init/"
-  PKG_CONFIG: "${{ github.workspace }}\\installed\\x64-windows-minsizerel\\bin\\pkgconf.exe"
 
 defaults:
   run:
@@ -55,8 +53,8 @@ jobs:
 
       - name: Bootstrap
         run: |
+          echo $env:PATH
           curl -L -o vcpkg.exe https://github.com/paperchalice/vcpkg-private-overlay/releases/download/init/vcpkg.exe
-          ./vcpkg install pkg-config
 
       - name: Build ${{ inputs.port_name }}
         run: |

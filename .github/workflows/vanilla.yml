@@ -13,7 +13,7 @@ run-name: Build port ${{ inputs.port_name }}
 
 env:
   VCPKG_DEFAULT_TRIPLET: x64-windows-release
-  VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-releases
+  VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-release
 
 defaults:
   run:
