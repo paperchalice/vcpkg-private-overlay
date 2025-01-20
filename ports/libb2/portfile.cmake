@@ -7,19 +7,17 @@ vcpkg_from_github(
     PATCHES msvc-cpuid.patch
 )
 
-set(OPTIONS)
 if(CMAKE_HOST_WIN32)
     set(OPTIONS --disable-native) # requires cpuid
 endif()
 
-vcpkg_configure_make(
-    AUTOCONFIG
-    SOURCE_PATH ${SOURCE_PATH}
+vcpkg_make_configure(
+    AUTORECONF
+    SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
-        ax_cv_check_cflags___O3=no # see https://github.com/microsoft/vcpkg/pull/17912#issuecomment-840514179
-        ${OPTIONS}
+        ax_cv_check_cflags___O3=no  # vcpkg provides actual flag
 )
-vcpkg_install_make()
+vcpkg_make_install()
 vcpkg_fixup_pkgconfig()
 
 
