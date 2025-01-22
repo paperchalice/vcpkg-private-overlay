@@ -1,0 +1,14 @@
+{
+  "name": "gperf",
+  "version": "3.1",
+  "description": "Perfect hash function generator",
+  "homepage": "https://www.gnu.org/software/gperf/",
+  "documentation": "https://www.gnu.org/software/gperf/manual/gperf.html",
+  "license": "GPL-3.0-or-later",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    }
+  ]
+}
