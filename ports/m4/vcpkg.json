@@ -1,0 +1,13 @@
+{
+  "name": "m4",
+  "version": "1.4.19",
+  "description": "Unix macro processor.",
+  "homepage": "https://www.gnu.org/software/m4/",
+  "license": "GPL-3.0-or-later",
+  "dependencies": [
+    {
+      "name": "vcpkg-make",
+      "host": true
+    }
+  ]
+}
