@@ -65,13 +65,18 @@ jobs:
       - name: Print log
         if: always()
         run: |
-          if(Test-Path ./buildtrees/${{ inputs.port_name }}/*.log)`
-          { cat ./buildtrees/${{ inputs.port_name }}/*.log }
+          $logs = Get-ChildItems -Path "./buildtrees/${{ inputs.port_name }}/*.log"
+          foreach($f in $logs)
+          {
+            Write-Output "::group::$f"
+            Get-Content $f
+            Write-Output "::endgroup::"
+          }
 
       - name: Package ${{ inputs.port_name }}
         run: |
           tar -C packages/${{ inputs.port_name }}_x64-windows-minsizerel `
-            -cf - * | `
+            -cvf - * | `
             7z a -txz -mx9 -ms=on -si ${{ inputs.port_name }}_x64-windows-minsizerel.tar.xz
 
       # - name: Upload ${{ inputs.port_name }} package
