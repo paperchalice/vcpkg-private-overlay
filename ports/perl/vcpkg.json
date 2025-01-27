@@ -1,0 +1,7 @@
+{
+  "name": "perl",
+  "version": "5.40.1",
+  "description": "Highly capable, feature-rich programming language.",
+  "homepage": "https://www.perl.org/",
+  "license": "Artistic-1.0-Perl"
+}
