@@ -65,11 +65,11 @@ jobs:
       - name: Print log
         if: always()
         run: |
-          $logs = Get-ChildItems -Path "./buildtrees/${{ inputs.port_name }}/*.log"
+          $logs = Get-ChildItem -Path "./buildtrees/${{ inputs.port_name }}/*.log"
           foreach($f in $logs)
           {
             Write-Output "::group::$f"
-            Get-Content $f
+            Get-Content -Path $f
             Write-Output "::endgroup::"
           }
 
