@@ -1,0 +1,77 @@
+diff --git a/win32/Makefile b/win32/Makefile
+--- a/win32/Makefile
++++ b/win32/Makefile
+@@ -19,9 +19,9 @@
+ # Set these to wherever you want "nmake install" to put your
+ # newly built perl.
+ #
+ INST_DRV	= c:
+-INST_TOP	= $(INST_DRV)\perl
++INST_TOP	= $(INSTALLDIR)
+ 
+ #
+ # Uncomment if you want to build a 32-bit Perl using a 32-bit compiler
+ # on a 64-bit version of Windows.
+@@ -108,9 +108,9 @@
+ #CCTYPE		= MSVC141
+ # Visual C++ 2019 (aka Visual C++ 14.2) (full version or Community Edition)
+ #CCTYPE		= MSVC142
+ # Visual C++ 2022 (aka Visual C++ 14.3) (full version or Community Edition)
+-#CCTYPE		= MSVC143
++CCTYPE		= MSVC143
+ 
+ #
+ # If you are using Intel C++ Compiler uncomment this
+ #
+@@ -396,12 +396,13 @@
+ HTMLDIR		= .\html
+ 
+ INST_SCRIPT	= $(INST_TOP)$(INST_VER)\bin
+ INST_BIN	= $(INST_SCRIPT)$(INST_ARCH)
+-INST_LIB	= $(INST_TOP)$(INST_VER)\lib
++INST_LIB	= $(INST_TOP)$(INST_VER)\lib\perl
++INST_DATA	= $(INST_TOP)$(INST_VER)\share\perl
+ INST_ARCHLIB	= $(INST_LIB)$(INST_ARCH)
+ INST_COREDIR	= $(INST_ARCHLIB)\CORE
+-INST_HTML	= $(INST_TOP)$(INST_VER)\html
++INST_HTML	= $(INST_DATA)\doc\html
+ 
+ #
+ # Programs to compile, build .lib files and link
+ #
+diff --git a/win32/win32.c b/win32/win32.c
+--- a/win32/win32.c
++++ b/win32/win32.c
+@@ -395,9 +395,9 @@
+ 
+ EXTERN_C char *
+ win32_get_privlib(WIN32_NO_REGISTRY_M_(const char *pl) STRLEN *const len)
+ {
+-    const char *stdlib = "lib";
++    const char *stdlib = "lib/perl";
+     SV *sv = NULL;
+ #ifndef WIN32_NO_REGISTRY
+     char buffer[MAX_PATH+1];
+ 
+@@ -460,9 +460,9 @@
+ 
+ EXTERN_C char *
+ win32_get_sitelib(const char *pl, STRLEN *const len)
+ {
+-    return win32_get_xlib(pl, WIN32_NO_REGISTRY_M_("sitelib") "site", len);
++    return win32_get_xlib(pl, WIN32_NO_REGISTRY_M_("sitelib") "share/perl/site", len);
+ }
+ 
+ #ifndef PERL_VENDORLIB_NAME
+ #  define PERL_VENDORLIB_NAME	"vendor"
+@@ -470,9 +470,9 @@
+ 
+ EXTERN_C char *
+ win32_get_vendorlib(const char *pl, STRLEN *const len)
+ {
+-    return win32_get_xlib(pl, WIN32_NO_REGISTRY_M_("vendorlib") PERL_VENDORLIB_NAME, len);
++    return win32_get_xlib(pl, WIN32_NO_REGISTRY_M_("vendorlib") "share/perl/"PERL_VENDORLIB_NAME, len);
+ }
+ 
+ static BOOL
+ has_shell_metachars(const char *ptr)

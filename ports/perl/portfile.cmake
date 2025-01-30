@@ -6,16 +6,21 @@ vcpkg_download_distfile(ARCHIVE
 vcpkg_extract_source_archive(
   SOURCE_PATH
   ARCHIVE ${ARCHIVE}
+  PATCHES
+    config.patch
 )
 
-set(make_file ${SOURCE_PATH}/win32/Makefile)
-cmake_path(NATIVE_PATH CURRENT_PACKAGES_DIR NORMALIZE install_dir_native)
-
-vcpkg_replace_string(${make_file} "#CCTYPE[ \t]*= MSVC143" "CCTYPE=MSVC143" REGEX)
-vcpkg_replace_string(${make_file} [[$(INST_DRV)\perl]] "${install_dir_native}")
-
+set(ENV{PERLLIB} ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/lib)
 vcpkg_install_nmake(
   SOURCE_PATH ${SOURCE_PATH}
   PROJECT_SUBPATH win32
   PROJECT_NAME Makefile
 )
+file(GLOB libs "${CURRENT_PACKAGES_DIR}/lib/*")
+file(MAKE_DIRECTORY ${CURRENT_PACKAGES_DIR}/lib/perl_tmp)
+foreach(f ${libs})
+  string(REPLACE ${CURRENT_PACKAGES_DIR}/lib ${CURRENT_PACKAGES_DIR}/lib/perl_tmp new_f ${f})
+  file(RENAME ${f} ${new_f})
+endforeach()
+file(RENAME ${CURRENT_PACKAGES_DIR}/lib/perl_tmp ${CURRENT_PACKAGES_DIR}/lib/perl)
+file(RENAME ${CURRENT_PACKAGES_DIR}/site ${CURRENT_PACKAGES_DIR}/share/perl/site)
